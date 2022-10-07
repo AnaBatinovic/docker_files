@@ -70,11 +70,26 @@ For more information, please refer to [realsense-ros](https://github.com/IntelRe
 
 A number of models are available. Default is **resnet50dilated** for encoder and **ppm_deepsup** for decoder.
 Download pretrained checkpoints for models from [CSAIL Website](http://sceneparsing.csail.mit.edu/model/pytorch) and copy them to ***src/ros-semantic-segmentation-pytorch/ckpt/{modelname}/***
-Command to copy file from the local folder to the folder in docker container (an example for ade20k-resnet50dilated-ppm_deepsup):
+
+Copy file from the local folder to the folder in docker container (an example for ade20k-resnet50dilated-ppm_deepsup):
 
 ```bash
+#  Run the container 
+docker start -i realsense_sem_seg_cont
+
+cd ros-semantic-segmentation-pytorch
+mkdir ckpt
+cd ckpt
+mkdir ade20k-resnet50dilated-ppm_deepsup
+
+# Run from local folder
 docker cp /source_path/encoder_epoch_20.pth ID_container:/root/catkin_ws/src/ros-semantic-segmentation-pytorch/ckpt/ade20k-resnet50dilated-ppm_deepsup 
 docker cp /source_path/decoder_epoch_20.pth ID_container:/root/catkin_ws/src/ros-semantic-segmentation-pytorch/ckpt/ade20k-resnet50dilated-ppm_deepsup 
+```
+How to find container ID?
+
+```bash
+docker ps -a
 ```
 ### Inference
 
