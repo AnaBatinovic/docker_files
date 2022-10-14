@@ -104,3 +104,11 @@ Configuration file contains option "imgSizes" which takes a tuple of heights, ov
 ```bash
 roslaunch semantic_segmentation_ros semantic_segmentation.launch
 ```
+
+### Image transport
+
+If the input in the semgentation node is topic `/camera/color/image_raw/compressed` ([sensor_msgs/CompressedImage](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/CompressedImage.html)), you need to republish the topic to `/camera/color/image_raw`([sensor_msgs/Image](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Image.html)):
+
+```bash
+rosrun image_transport republish compressed in:=/camera/color/image_raw raw out:=/camera/color/image_raw
+```
