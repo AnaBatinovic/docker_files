@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-base-ubuntu18.04
+FROM nvidia/cuda:10.2-devel-ubuntu18.04
 # Use ARG - persists only during docker build
 # https://github.com/moby/moby/issues/4032#issuecomment-192327844
 ARG CATKIN_WORKSPACE=catkin_ws
@@ -74,10 +74,10 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 # Switch to non-root user 
 USER developer
 
-# Install Miniconda and Python 3.8
+# Install Miniconda (the latest vesion !!! hahhaha) and Python 3.8
 ENV CONDA_AUTO_UPDATE_CONDA=false
 ENV PATH=/home/developer/miniconda/bin:$PATH
-RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py38_4.8.2-Linux-x86_64.sh | bash \
+RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh | bash \
  && chmod +x ~/miniconda.sh \
  && ~/miniconda.sh -b -p ~/miniconda \
  && rm ~/miniconda.sh \
@@ -85,12 +85,7 @@ RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py38
  && conda clean -ya
 
 # CUDA 10.2-specific steps
-RUN conda install -y -c pytorch \
-    cudatoolkit=10.2 \
-    "pytorch=1.5.0=py3.8_cuda10.2.89_cudnn7.6.5_0" \
-    "torchvision=0.6.0=py38_cu102" \
- && conda clean -ya
-
+RUN conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 # Install packages neccessary for training and testing neural networks
 RUN conda install -c anaconda \
                      scipy \
