@@ -4,20 +4,20 @@ Install Docker using installation instruction found [here](https://docs.docker.c
 Run Dockerfile from the project root directory using the following commands:
 ```bash
 # Build a Dockerfile
-docker build -t realsense_sem_seg realsense_sem_seg_ros 
+docker build -t orb_slam3 orb_slam3 
 
-# Run the realsense_sem_seg_cont container for the fist time
+# Run the orb_slam3_cont container for the fist time
 export DOCKER_BUILDKIT=1
-./realsense_ros/first_run.sh
+./orb_slam3/first_run.sh
 
 #  Run the container 
-docker start -i realsense_sem_seg_cont
+docker start -i orb_slam3_cont
 
 # Stop the conatainer
-docker stop realsense_sem_seg_cont
+docker stop orb_slam3_cont
 
 # Delete the container
-docker rm realsense_sem_seg_cont
+docker rm orb_slam3_cont
 ```
 
 ## RealSense camera - usage Instructions for ROS
@@ -112,3 +112,32 @@ If the input in the semgentation node is topic `/camera/color/image_raw/compress
 ```bash
 rosrun image_transport republish compressed in:=/camera/color/image_raw raw out:=/camera/color/image_raw
 ```
+
+### Test ORB_SLAM3_ROS in the Docker container
+
+The package is cloned from [zhaozhongch/orbslam3_ros](https://github.com/zhaozhongch/orbslam3_ros).
+
+To test the package on the Euroc dataset, please downoload the data from [euroc_mav_dataset](http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/).
+
+To run the package in the docker container, in one terminal run:
+
+```
+roscore
+```
+
+
+In another terminal from catkin workspace run:
+
+```
+rosrun orbslam3 ros_stereo_inertial src/orbslam3/Vocabulary/ORBvoc.txt src/orbslam3/Examples/Stereo-Inertial/EuRoC.yaml true
+```
+
+Then navigate to the folder where the bag is and run:
+
+```
+rosbag play MH_03_medium.bag /cam0/image_raw:=/gray_image0 /cam1/image_raw:=/gray_image1 /imu0:=/gx5/imu/data
+```
+
+### Publish Topic
+If you run the such as the `ros_stereo_inertial`, you can get the ROS topic `/tesse/odom`.
+You can use this as a base to develop and publish the information you want.
