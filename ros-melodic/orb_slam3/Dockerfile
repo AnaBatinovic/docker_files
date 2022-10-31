@@ -1,6 +1,7 @@
 FROM nvidia/opengl:1.2-glvnd-runtime-ubuntu18.04
 
-ARG CATKIN_WORKSPACE=catkin_ws
+LABEL maintainer ana.milas@fer.hr
+
 ARG DEBIAN_FRONTEND=noninteractive
 ARG ROS_DISTRO=melodic
 ARG USER=developer 
@@ -78,27 +79,6 @@ RUN apt-get install openssh-client git
 # Download public key for github.com
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-# # Installing ROS-melodic
-# RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-# RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-# RUN curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | apt-key add -
-# RUN apt update
-# RUN apt install -y ros-melodic-desktop
-# RUN apt-get install -y python-rosdep
-# RUN rosdep init
-# RUN rosdep update
-# RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-# RUN apt install -y python-rosinstall python-rosinstall-generator python-wstool build-essential
-
-# Intalling python-catkin
-# RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
-# RUN wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-# RUN apt-get update
-# RUN apt-get install -y python-catkin-tools
-# RUN apt-get install -y software-properties-common
-
-# RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bash_profile
-
 # Build OpenCV (3.0 or higher should be fine)
 RUN apt-get install -y python3-dev python3-numpy 
 RUN apt-get install -y python-dev python-numpy
@@ -121,48 +101,25 @@ RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
     make -j$nproc && make install && \
     cd / && rm -rf /tmp/Pangolin
 
-# COPY ros_entrypoint.sh /ros_entrypoint.sh
-# RUN chmod +x  /ros_entrypoint.sh
-# ENV ROS_DISTRO melodic
-# ENV LANG en_US.UTF-8
-
-# ENTRYPOINT ["/ros_entrypoint.sh"]
-
-
-#  Create a non-root user
-# RUN adduser --disabled-password \
-#     --gecos '' ${USER}
-# RUN adduser ${USER} sudo 
-# RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# # Switch to non-root user 
-# USER developer
-# # terminal colors with xterm
-# ENV TERM xterm
-# RUN mkdir /ORB_SLAM3
-# WORKDIR /ORB_SLAM3
-# CMD ["bash"]
-
-# Install workspace
-# RUN curl https://raw.githubusercontent.com/larics/uav_ros_stack/main/installation/workspace_setup.sh | bash -s $CATKIN_WORKSPACE
+# Create catkin workspace
 WORKDIR /root
-RUN mkdir -p catkin_ws/src 
-RUN bash -c "source /opt/ros/melodic/setup.bash"
-WORKDIR /root/catkin_ws
-RUN bash -c "catkin init"
-RUN /bin/bash -c ". /opt/ros/melodic/setup.bash; catkin_make"
-# Clone and build ORB_SLAM3
-# RUN mkdir /ORB_SLAM3
-# WORKDIR /ORB_SLAM3
+RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+RUN /bin/bash -c "source /opt/ros/melodic/setup.bash && \
+                 mkdir -p ~/catkin_ws/src && \
+                 cd ~/catkin_ws/src && \
+                 catkin_init_workspace && \
+                 cd ~/catkin_ws/ && \
+                 catkin_make"
+RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
-# Git pull orbslam and compile
+# Clone and build ORB_SLAM3
 WORKDIR /root/
 RUN git clone -b docker_opencv3.2_fix https://github.com/jahaniam/ORB_SLAM3 
 RUN cd /root/ORB_SLAM3 \
     chmod +x build.sh \
     ./build.sh
 
-# Compile ORBSLAM3-ROS
+# Clone and build ORB_SLAM3_ROS
 RUN touch ~/.bashrc
 RUN echo "ROS_PACKAGE_PATH=/opt/ros/melodic/share:/ORB_SLAM3/Examples/ROS" >> ~/.bashrc
 RUN bash -c "source ~/.bashrc"
@@ -170,9 +127,11 @@ RUN cd /root/ORB_SLAM3 \
     chmod +x build_ros.sh \
     ./build_ros.sh
 
-# Clone and build other packages
+# Clone and build orbslam3 ros wrapper
 WORKDIR /root/catkin_ws/src
-RUN git clone https://github.com/zhaozhongch/orbslam3_ros
-WORKDIR /root/catkin_ws/src/orbslam3_ros
-RUN ./build_thrid_party.sh
-RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; cd /root/catkin_ws; catkin_make'
+RUN /bin/bash -c "git clone https://github.com/zhaozhongch/orbslam3_ros && \
+                 cd ~/catkin_ws/src/orbslam3_ros && \
+                 ./build_thrid_party.sh && \
+                 cd ~/catkin_ws/ && \
+                 source /opt/ros/melodic/setup.bash && \
+                 catkin_make"
