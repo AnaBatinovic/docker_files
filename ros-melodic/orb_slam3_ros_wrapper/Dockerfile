@@ -101,5 +101,8 @@ RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 WORKDIR /root/catkin_ws/src
 RUN /bin/bash -c "git clone https://github.com/AnaBatinovic/orb_slam3_ros_wrapper.git "
 RUN /bin/bash -c "catkin build"
-RUN bash -c "source ~/catkin_ws/devel/setup.bash"
+RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+RUN cp ~/ORB_SLAM3/Vocabulary/ORBvoc.txt ~/catkin_ws/src/orb_slam3_ros_wrapper/config
+
 CMD ["bash"]

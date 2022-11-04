@@ -25,6 +25,12 @@ The package is forked from [thien94/orb_slam3_ros_wrapper](https://github.com/th
 
 To test the package on the Euroc dataset, please downoload the data from [euroc_mav_dataset](http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/).
 
+(Optional) Install `hector-trajectory-server` to visualize the trajectory.
+
+```
+sudo apt install ros-[DISTRO]-hector-trajectory-server
+```
+
 To run the package in the docker container, in one terminal run:
 
 ```
@@ -37,6 +43,7 @@ In another terminal run:
 rosbag play MH_01_easy.bag
 ```
 
+If everything works fine, you can now try the different launch files in the `launch` folder.
 ### Publish Topic
 The following topics are published by each node:
 - `/orb_slam3/map_points` ([`PointCloud2`](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/PointCloud2.html)): all keypoints being tracked.
