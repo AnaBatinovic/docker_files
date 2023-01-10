@@ -4,20 +4,20 @@ Install Docker using installation instruction found [here](https://docs.docker.c
 Run Dockerfile from the project root directory using the following commands:
 ```bash
 # Build a Dockerfile
-docker build -t realsense_sem_seg realsense_sem_seg_ros 
+docker build -t realsense_detectron2_ros_cont realsense_detectron2_ros 
 
-# Run the realsense_sem_seg_cont container for the fist time
+# Run the realsense_detectron2_ros_cont container for the fist time
 export DOCKER_BUILDKIT=1
 ./realsense_ros/first_run.sh
 
 #  Run the container 
-docker start -i realsense_sem_seg_cont
+docker start -i realsense_detectron2_ros_cont
 
 # Stop the conatainer
-docker stop realsense_sem_seg_cont
+docker stop realsense_detectron2_ros_cont
 
 # Delete the container
-docker rm realsense_sem_seg_cont
+docker rm realsense_detectron2_ros_cont
 ```
 
 ## RealSense camera - usage Instructions for ROS
